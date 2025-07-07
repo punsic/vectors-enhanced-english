@@ -1,5 +1,5 @@
 {
-    "display_name": "聊天记录超级管理器",
+    "display_name": "Chat History Super Manager",
     "loading_order": 5000,
     "requires": [],
     "optional": [
@@ -11,5 +11,5 @@
     "author": "RaphllA",
     "version": "1.0.2",
     "homePage": "https://github.com/RaphllA/vectors-enhanced",
-    "description": "增强版向量存储插件，支持多任务管理、自定义内容标签、中文界面、隐藏消息管理等功能。可批量隐藏/显示消息范围，并选择是否包含隐藏消息进行向量化。"
+    "description": "Enhanced vector storage plugin with multi-task management, custom content tags, Chinese interface, hidden message management, and more. Supports batch hiding/showing message ranges and selective inclusion of hidden messages for vectorization."
 }

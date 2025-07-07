@@ -1,11 +1,11 @@
-/* 聊天记录超级管理器样式 */
+/* Chat History Super Manager Styles */
 
-/* 主容器样式 */
+/* Main container styles */
 #vectors_enhanced_container .inline-drawer-content {
     padding: 0.75rem;
 }
 
-/* 各个section之间的间距 */
+/* Spacing between sections */
 .vectors-enhanced-section {
     margin-bottom: 1rem;
 }
@@ -25,7 +25,7 @@
     margin-bottom: 0.5rem;
 }
 
-/* 隐藏消息信息区域 */
+/* Hidden messages info area */
 .hidden-messages-info {
     background-color: var(--SmartThemeBlurTintColor);
     border: 1px solid var(--SmartThemeBorderColor);
@@ -72,7 +72,7 @@
     margin-bottom: 0;
 }
 
-/* 隐藏消息弹窗样式 */
+/* Hidden messages popup styles */
 .hidden-messages-popup h3 {
     color: var(--SmartThemeQuoteColor);
     margin-bottom: 1rem;
@@ -88,7 +88,7 @@
     text-align: left;
 }
 
-/* 预览弹窗改进样式 */
+/* Improved preview popup styles */
 .vector-preview {
     height: 70vh;
     display: flex;
@@ -125,7 +125,7 @@
     text-align: left;
 }
 
-/* 按钮样式优化 */
+/* Optimized button styles */
 #vectors_enhanced_hide_range,
 #vectors_enhanced_unhide_range,
 #vectors_enhanced_show_hidden {
@@ -142,7 +142,7 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* 刷新按钮样式 - 宽度匹配文字内容 */
+/* Refresh button styles - width matches text content */
 #vectors_enhanced_files_refresh,
 #vectors_enhanced_wi_refresh {
     min-width: auto;
@@ -151,21 +151,21 @@
     white-space: nowrap;
 }
 
-/* 主开关禁用时的样式 */
+/* Styles when main switch is disabled */
 #vectors_enhanced_container.vectors-disabled .vectors-enhanced-section {
     opacity: 0.6;
     pointer-events: none;
     filter: grayscale(50%);
 }
 
-/* 确保主开关始终可用，不受禁用样式影响 */
+/* Ensure main switch is always usable, not affected by disabled styles */
 #vectors_enhanced_master_enabled {
     pointer-events: auto !important;
     opacity: 1 !important;
     filter: none !important;
 }
 
-/* 主开关的父容器也要确保可用 */
+/* Main switch parent container should also be usable */
 #vectors_enhanced_container.vectors-disabled #vectors_enhanced_master_enabled,
 #vectors_enhanced_container.vectors-disabled label[for="vectors_enhanced_master_enabled"] {
     pointer-events: auto !important;
@@ -173,7 +173,7 @@
     filter: none !important;
 }
 
-/* 内容类型部分样式 */
+/* Content type section styles */
 .content-type-section {
     background-color: var(--SmartThemeBlurTintColor);
     border-radius: 6px;
@@ -193,7 +193,7 @@
     border-left: 2px solid var(--SmartThemeBorderColor);
 }
 
-/* 进度条样式 */
+/* Progress bar styles */
 .vectors-enhanced-progress {
     margin-top: 1rem;
 }
@@ -218,7 +218,7 @@
     color: var(--SmartThemeEmColor);
 }
 
-/* 预览弹窗样式 */
+/* Preview popup styles */
 .vector-preview {
     max-height: 60vh;
     overflow-y: auto;
@@ -296,7 +296,7 @@
     word-break: break-word;
 }
 
-/* 任务列表样式 */
+/* Task list styles */
 .vector-enhanced-task-item {
     display: flex;
     align-items: center;
@@ -317,7 +317,7 @@
     margin-left: 0.5rem;
 }
 
-/* 输入框和选择框样式优化 */
+/* Optimized input and select styles */
 .vectors-enhanced-section input[type="number"],
 .vectors-enhanced-section input[type="text"],
 .vectors-enhanced-section select,
@@ -335,7 +335,7 @@
     outline: none;
 }
 
-/* 单选按钮组样式 */
+/* Radio button group styles */
 .vectors-enhanced-section .radio_group {
     background-color: var(--SmartThemeBlurTintColor);
     padding: 0.5rem;
@@ -349,7 +349,7 @@
     padding: 0.25rem 0;
 }
 
-/* 操作按钮容器 */
+/* Action button container */
 .vectors-enhanced-actions {
     gap: 0.5rem;
     margin-top: 1rem;
@@ -371,7 +371,7 @@
     margin-right: 0.5rem;
 }
 
-/* 文件和世界信息列表样式 */
+/* File and world info list styles */
 .file-list,
 .wi-list {
     max-height: 200px;
@@ -409,7 +409,7 @@
     padding-left: 1rem;
 }
 
-/* 任务列表样式优化 */
+/* Optimized task list styles */
 .task-list {
     background-color: var(--SmartThemeBlurTintColor);
     border-radius: 6px;
@@ -437,7 +437,7 @@
     margin-bottom: 0.5rem;
 }
 
-/* 复选框样式优化 */
+/* Optimized checkbox styles */
 .vectors-enhanced-section .checkbox_label {
     display: flex;
     align-items: center;
@@ -453,7 +453,7 @@
     margin-right: 0.5rem;
 }
 
-/* 小标签样式 */
+/* Small tag styles */
 .vectors-enhanced-section small {
     color: var(--SmartThemeEmColor);
     display: block;
@@ -461,14 +461,14 @@
     line-height: 1.4;
 }
 
-/* 分隔线样式 */
+/* Separator line styles */
 .vectors-enhanced-section hr {
     border: none;
     border-top: 1px solid var(--SmartThemeBorderColor);
     margin: 1rem 0;
 }
 
-/* 状态信息样式 */
+/* Status info styles */
 .vectors-enhanced-status {
     background-color: var(--SmartThemeBlurTintColor);
     border-radius: 6px;
@@ -479,12 +479,12 @@
     font-weight: 500;
 }
 
-/* 工具提示样式 */
+/* Tooltip styles */
 [title] {
     cursor: help;
 }
 
-/* 响应式设计改进 */
+/* Responsive design improvements */
 @media (max-width: 768px) {
     .vectors-enhanced-actions {
         flex-direction: column;

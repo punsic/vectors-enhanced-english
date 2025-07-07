@@ -1,72 +1,72 @@
-# 聊天记录超级管理器
+# Chat History Super Manager
 
-这是一款为 SillyTavern 设计的**增强版向量数据库（RAG）插件**。它彻底革新了您管理和利用聊天上下文的方式，让您能够以前所未有的精度和灵活性，将海量的背景信息、聊天记录和外部文件注入到 AI 的“记忆”中。
+This is an **enhanced vector database (RAG) plugin** designed for SillyTavern. It completely revolutionizes how you manage and utilize chat context, enabling you to inject massive amounts of background information, chat records, and external files into AI's "memory" with unprecedented precision and flexibility.
 
-告别单一、混乱的向量存储，拥抱为高级用户和剧情创作者量身打造的**多任务、精细化、可定制**的上下文管理新时代。
-
----
-
-## ✨ 核心功能
-
-### 1. 📂 多任务向量化管理
-这是本插件的王牌功能。您可以针对**同一个聊天**，创建**多个、独立的向量化任务**。
-
-*   **创建快照**：将特定范围的聊天记录、选定的世界信息和文件打包成一个独立的“任务”。
-*   **A/B 测试**：创建包含不同内容的任务（例如，一个包含角色背景，另一个包含剧情大纲），轻松切换启用，对比 AI 的不同反应。
-*   **场景隔离**：为不同的故事线或场景创建独立的知识库，只在需要时激活，避免信息干扰。
-
-
-### 2. 🎯 精细化的内容选择
-您可以精确控制哪些内容需要被向量化，来源包括：
-*   **聊天记录**：
-    *   自由选择消息的起止范围（如从第10条到第50条）。
-    *   筛选用户或AI的消息。
-    *   **标签内容提取**：只向量化消息中特定标签（如 `<context>`...`</context>`）内的文本，实现精准信息抓取。
-*   **文件**：从数据库或聊天附件中选择任意文件（如 `.txt`, `.md`）。
-*   **世界信息 (World Info)**：清晰地按“世界”分组，自由勾选需要启用的条目。
-
-### 3. 📝 自定义上下文注入
-完全掌控向量化内容如何呈现给 AI：
-*   **自定义注入模板**：使用 `{{text}}` 占位符，自由编写注入内容的格式。
-*   **自定义内容标签**：为不同来源（聊天、文件、世界信息）的内容打上不同的XML风格标签（如 `<past_chat>`, `<databank>`），让 AI 能更好地区分和理解上下文。
-*   **灵活的注入位置**：支持在主提示前、主提示后或聊天记录的任意深度注入。
-
-### 4. ⚙️ 强大的文本处理与查询设置
-*   **分块设置**：自定义文本块大小、重叠比例和分隔符。
-*   **查询调优**：设置查询时使用的最近消息数量、返回结果的最大数量和相似度分数阈值，以平衡相关性和上下文长度。
-*   **双引擎支持**：支持使用本地 `Transformers` 或 `vLLM` 作为向量化后端。
-
-### 5. 🚀 便捷的操作体验
-*   **预览内容**：在向量化之前，一键预览所有已选择的内容，确保信息无误。
-*   **导出为文本**：轻松将选择的内容导出为结构化的 `.txt` 文件，方便备份和查阅。
-*   **进度显示**：在进行向量化时，提供清晰的进度条和状态反馈。
-*   **快捷指令**：支持 `/vec-preview`, `/vec-export`, `/vec-process` 等斜杠命令。
-
-
+Say goodbye to single, chaotic vector storage, and embrace the new era of **multi-task, fine-grained, customizable** context management tailored for advanced users and story creators.
 
 ---
 
-## 📖 使用指南
+## ✨ Core Features
 
-1.  **打开面板**：在右侧面板区找到 “聊天记录超级管理器” 并展开。
-2.  **选择向量化模型**：提供了vllm和本地模型两种方式（需要在sillytavern的API设置界面进行对应的API配置）
-3.  **选择内容**：
-    *   在 “内容选择” 部分，勾选你想向量化的来源（聊天消息、文件、世界信息）。
-    *   展开对应的设置，进行详细选择（如消息范围、具体文件等）。
-4.  **配置设置**：检查 “向量化设置” 和 “注入设置”，根据需要进行调整。
-5.  **创建任务**：
-    *   点击 `预览` 按钮检查你选择的内容是否正确。
-    *   点击 `向量化` 按钮。插件会处理你选择的所有内容，并在 “向量化任务” 列表中创建一个新任务。
-6.  **激活任务**：确保你想在下次聊天中使用的任务是**勾选启用**状态。
-7.  **开始聊天**：正常与 AI 对话。插件会在后台自动查询已启用的任务，并将最相关的信息注入到提示中。
+### 1. 📂 Multi-Task Vector Management
+This is the flagship feature of this plugin. You can create **multiple, independent vectorization tasks** for the **same chat**.
+
+*   **Create Snapshots**: Package specific ranges of chat records, selected world information, and files into an independent "task".
+*   **A/B Testing**: Create tasks containing different content (e.g., one with character background, another with plot outline), easily switch between them, and compare AI's different responses.
+*   **Scene Isolation**: Create independent knowledge bases for different storylines or scenarios, activate only when needed, avoiding information interference.
+
+
+### 2. 🎯 Fine-Grained Content Selection
+You can precisely control which content needs to be vectorized, with sources including:
+*   **Chat Records**:
+    *   Freely select message start and end ranges (e.g., from message 10 to 50).
+    *   Filter user or AI messages.
+    *   **Tag Content Extraction**: Only vectorize text within specific tags in messages (e.g., `<context>`...`</context>`), achieving precise information extraction.
+*   **Files**: Select any files from database or chat attachments (e.g., `.txt`, `.md`).
+*   **World Info**: Clearly grouped by "world", freely check the entries you want to enable.
+
+### 3. 📝 Custom Context Injection
+Take complete control over how vectorized content is presented to AI:
+*   **Custom Injection Templates**: Use `{{text}}` placeholders to freely write the format of injected content.
+*   **Custom Content Tags**: Tag content from different sources (chat, files, world info) with different XML-style tags (e.g., `<past_chat>`, `<databank>`), helping AI better distinguish and understand context.
+*   **Flexible Injection Positions**: Support injection before main prompt, after main prompt, or at any depth in chat records.
+
+### 4. ⚙️ Powerful Text Processing and Query Settings
+*   **Chunking Settings**: Customize text chunk size, overlap ratio, and separators.
+*   **Query Tuning**: Set the number of recent messages used for queries, maximum number of returned results, and similarity score thresholds to balance relevance and context length.
+*   **Dual Engine Support**: Support using local `Transformers` or `vLLM` as vectorization backend.
+
+### 5. 🚀 Convenient Operation Experience
+*   **Preview Content**: Preview all selected content with one click before vectorization to ensure information accuracy.
+*   **Export as Text**: Easily export selected content as structured `.txt` files for backup and reference.
+*   **Progress Display**: Provide clear progress bars and status feedback during vectorization.
+*   **Quick Commands**: Support slash commands like `/vec-preview`, `/vec-export`, `/vec-process`.
+
+
 
 ---
 
-## 💡 一些用法
+## 📖 Usage Guide
 
-*   **情景模拟**：创建一个“和平时期”的任务和一个“战争时期”的任务，包含不同的世界信息和背景。通过切换任务的启用状态，让角色在不同情景下做出截然不同的反应。
-*   **结构化提示**：利用自定义内容标签功能，你可以这样指导你的AI：
+1.  **Open Panel**: Find "Chat History Super Manager" in the right panel area and expand it.
+2.  **Select Vectorization Model**: Provides two options: vllm and local models (requires corresponding API configuration in SillyTavern's API settings interface).
+3.  **Select Content**:
+    *   In the "Content Selection" section, check the sources you want to vectorize (chat messages, files, world info).
+    *   Expand corresponding settings for detailed selection (e.g., message range, specific files).
+4.  **Configure Settings**: Check "Vectorization Settings" and "Injection Settings", adjust as needed.
+5.  **Create Task**:
+    *   Click the `Preview` button to check if your selected content is correct.
+    *   Click the `Vectorize` button. The plugin will process all your selected content and create a new task in the "Vectorization Tasks" list.
+6.  **Activate Task**: Ensure the task you want to use in the next chat is **checked as enabled**.
+7.  **Start Chatting**: Chat normally with AI. The plugin will automatically query enabled tasks in the background and inject the most relevant information into the prompt.
+
+---
+
+## 💡 Some Usage Examples
+
+*   **Scenario Simulation**: Create a "peacetime" task and a "wartime" task containing different world information and backgrounds. By switching task enable status, make characters react completely differently in different scenarios.
+*   **Structured Prompts**: Using the custom content tags feature, you can guide your AI like this:
     ```
-    这是一个关于过去对话的摘要：<past_chat>...</past_chat>。这是一些相关的背景知识：<databank>...</databank>。请基于以上信息回答。
+    This is a summary of past conversations: <past_chat>...</past_chat>. This is some relevant background knowledge: <databank>...</databank>. Please answer based on the above information.
     ```
-*   **精准信息提取**：在你的聊天记录中，用 `<think>` 标签包裹角色的内心思考。然后，在向量化时，只提取 `<think>` 标签内的内容，创建一个“角色内心独白”的专属知识库。
+*   **Precise Information Extraction**: In your chat records, wrap character inner thoughts with `<think>` tags. Then, during vectorization, only extract content within `<think>` tags to create a dedicated knowledge base of "character inner monologue".

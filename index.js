@@ -54,15 +54,15 @@ export const EXTENSION_PROMPT_TAG = '3_vectors';
 
 const settings = {
     // Master switch - controls all plugin functionality
-    master_enabled: true,  // 主开关：控制整个插件的所有功能，默认禁用
+    master_enabled: true,  // Master switch: controls all functionality of the entire plugin, disabled by default
     
     // Vector source settings
     source: 'transformers',
-    local_model: '',        // 本地transformers模型名称
+    local_model: '',        // Local transformers model name
     vllm_model: '',
     vllm_url: '',
-    ollama_model: '',       // ollama模型名称
-    ollama_url: '',         // ollama API地址
+    ollama_model: '',       // ollama model name
+    ollama_url: '',         // ollama API address
     
     // General vectorization settings
     auto_vectorize: true,
@@ -72,12 +72,12 @@ const settings = {
     force_chunk_delimiter: '',
     
     // Query settings
-    enabled: true,      // 是否启用向量查询
-    query_messages: 3,  // 查询使用的最近消息数
-    max_results: 10,    // 返回的最大结果数
+    enabled: true,      // Whether to enable vector query
+    query_messages: 3,  // Number of recent messages to use for query
+    max_results: 10,    // Maximum number of results to return
     
     // Injection settings
-    template: '<must_know>以下是从相关背景知识库，包含重要的上下文、设定或细节：\n{{text}}</must_know>',
+    template: '<must_know>The following is from the relevant knowledge base, containing important context, settings, or details:\n{{text}}</must_know>',
     position: extension_prompt_types.IN_PROMPT,
     depth: 2,
     depth_role: extension_prompt_roles.SYSTEM,
@@ -97,7 +97,7 @@ const settings = {
             range: { start: 0, end: -1 },
             types: { user: true, assistant: true },
             tags: '', // comma-separated tag names to extract
-            include_hidden: false // 是否包含隐藏消息
+            include_hidden: false // Whether to include hidden messages
         },
         files: { enabled: false, selected: [] },
         world_info: { enabled: false, selected: {} } // { worldId: [entryIds] }
@@ -267,9 +267,9 @@ async function getVectorizableContent() {
         const tagList = tags ? tags.split(',').map(t => t.trim()).filter(t => t) : [];
         
         messages.forEach((msg, idx) => {
-            // 处理隐藏消息
+            // Handle hidden messages
             if (msg.is_system === true && !chatSettings.include_hidden) {
-                return; // 跳过隐藏的消息（除非明确要包含）
+                return; // Skip hidden messages (unless explicitly included)
             }
             
             if (!types.user && msg.is_user) return;
@@ -358,7 +358,7 @@ function updateProgress(current, total, message) {
 function hideProgress() {
     $('#vectors_enhanced_progress').hide();
     $('#vectors_enhanced_progress .progress-bar-inner').css('width', '0%');
-    $('#vectors_enhanced_progress .progress-text').text('准备中...');
+    $('#vectors_enhanced_progress .progress-text').text('Preparing...');
 }
 
 /**
@@ -375,9 +375,9 @@ async function generateTaskName(chatSettings, itemCount) {
         const start = chatSettings.range?.start || 0;
         const end = chatSettings.range?.end || -1;
         if (end === -1) {
-            parts.push(`消息 #${start} 到最后`);
+            parts.push(`Messages #${start} to end`);
         } else {
-            parts.push(`消息 #${start}-${end}`);
+            parts.push(`Messages #${start}-${end}`);
         }
     }
     
@@ -385,7 +385,7 @@ async function generateTaskName(chatSettings, itemCount) {
     if (settings.selected_content.files.enabled) {
         const fileCount = settings.selected_content.files.selected.length;
         if (fileCount > 0) {
-            parts.push(`${fileCount} 个文件`);
+            parts.push(`${fileCount} files`);
         }
     }
     
@@ -393,13 +393,13 @@ async function generateTaskName(chatSettings, itemCount) {
     if (settings.selected_content.world_info.enabled) {
         const wiCount = Object.values(settings.selected_content.world_info.selected).flat().length;
         if (wiCount > 0) {
-            parts.push(`${wiCount} 条世界信息`);
+            parts.push(`${wiCount} world info entries`);
         }
     }
     
     // If no specific content selected, use generic name
     if (parts.length === 0) {
-        parts.push(`${itemCount} 个项目`);
+        parts.push(`${itemCount} items`);
     }
     
     // Add timestamp
@@ -419,7 +419,7 @@ async function updateTaskList() {
     taskList.empty();
     
     if (tasks.length === 0) {
-        taskList.append('<div class="text-muted">没有向量化任务</div>');
+        taskList.append('<div class="text-muted">No vectorization tasks</div>');
         return;
     }
     
@@ -442,16 +442,16 @@ async function updateTaskList() {
             saveSettingsDebounced();
         });
         
-        const deleteBtn = $(`<button class="menu_button menu_button_icon" title="删除此任务">
+        const deleteBtn = $(`<button class="menu_button menu_button_icon" title="Delete this task">
             <i class="fa-solid fa-trash"></i>
         </button>`);
         
         deleteBtn.on('click', async () => {
-            const confirm = await callGenericPopup('确定要删除这个向量化任务吗？', POPUP_TYPE.CONFIRM);
+            const confirm = await callGenericPopup('Are you sure you want to delete this vectorization task?', POPUP_TYPE.CONFIRM);
             if (confirm === POPUP_RESULT.AFFIRMATIVE) {
                 await removeVectorTask(chatId, task.taskId);
                 await updateTaskList();
-                toastr.success('任务已删除');
+                toastr.success('Task deleted');
             }
         });
         
@@ -468,13 +468,13 @@ async function updateTaskList() {
 async function vectorizeContent() {
     const items = await getVectorizableContent();
     if (items.length === 0) {
-        toastr.warning('未选择要向量化的内容');
+        toastr.warning('No content selected for vectorization');
         return;
     }
     
     const chatId = getCurrentChatId();
     if (!chatId) {
-        toastr.error('未选择聊天');
+        toastr.error('No chat selected');
         return;
     }
     
@@ -484,8 +484,8 @@ async function vectorizeContent() {
     const taskName = await generateTaskName(chatSettings, items.length);
     
     try {
-        toastr.info('向量化开始...', '处理中');
-        updateProgress(0, items.length, '准备向量化');
+        toastr.info('Vectorization starting...', 'Processing');
+        updateProgress(0, items.length, 'Preparing for vectorization');
         
         // Create new task
         const taskId = generateTaskId();
@@ -522,16 +522,16 @@ async function vectorizeContent() {
             });
             
             processedItems++;
-            updateProgress(processedItems, items.length, '正在处理内容');
+            updateProgress(processedItems, items.length, 'Processing content');
         }
         
         // Insert vectors in batches
-        updateProgress(0, allChunks.length, '正在插入向量');
+        updateProgress(0, allChunks.length, 'Inserting vectors');
         const batchSize = 50;
         for (let i = 0; i < allChunks.length; i += batchSize) {
             const batch = allChunks.slice(i, Math.min(i + batchSize, allChunks.length));
             await insertVectorItems(collectionId, batch);
-            updateProgress(Math.min(i + batchSize, allChunks.length), allChunks.length, '正在插入向量');
+            updateProgress(Math.min(i + batchSize, allChunks.length), allChunks.length, 'Inserting vectors');
         }
         
         // Add task to list
@@ -545,14 +545,14 @@ async function vectorizeContent() {
         });
         
         hideProgress();
-        toastr.success(`成功创建向量化任务 "${taskName}"：${items.length} 个项目，${allChunks.length} 个块`, '成功');
+        toastr.success(`Successfully created vectorization task "${taskName}": ${items.length} items, ${allChunks.length} chunks`, 'Success');
         
         // Refresh task list UI
         await updateTaskList();
     } catch (error) {
-        console.error('向量化失败:', error);
+        console.error('Vectorization failed:', error);
         hideProgress();
-        toastr.error('向量化内容失败', '错误');
+        toastr.error('Failed to vectorize content', 'Error');
     }
 }
 
@@ -565,19 +565,19 @@ async function exportVectors() {
     const chatId = getCurrentChatId();
     
     if (!chatId) {
-        toastr.error('未选择聊天');
+        toastr.error('No chat selected');
         return;
     }
     
     const items = await getVectorizableContent();
     if (items.length === 0) {
-        toastr.warning('未选择要导出的内容');
+        toastr.warning('No content selected for export');
         return;
     }
     
     // Build export content
-    let exportText = `角色卡：${context.name || '未知'}\n`;
-    exportText += `时间：${new Date().toLocaleString('zh-CN')}\n\n`;
+    let exportText = `Character Card: ${context.name || 'Unknown'}\n`;
+    exportText += `Time: ${new Date().toLocaleString('zh-CN')}\n\n`;
     
     // Group items by type
     const grouped = items.reduce((acc, item) => {
@@ -587,36 +587,36 @@ async function exportVectors() {
     }, {});
     
     // Files
-    exportText += '=== 数据库文件 ===\n';
+    exportText += '=== Databank Files ===\n';
     if (grouped.file && grouped.file.length > 0) {
         grouped.file.forEach(item => {
-            exportText += `文件名：${item.metadata.name}\n`;
-            exportText += `内容：\n${item.text}\n\n`;
+            exportText += `File Name: ${item.metadata.name}\n`;
+            exportText += `Content:\n${item.text}\n\n`;
         });
     } else {
-        exportText += '无\n\n';
+        exportText += 'None\n\n';
     }
     
     // World Info
-    exportText += '=== 世界书 ===\n';
+    exportText += '=== World Book ===\n';
     if (grouped.world_info && grouped.world_info.length > 0) {
         grouped.world_info.forEach(item => {
-            exportText += `世界：${item.metadata.world}\n`;
-            exportText += `注释：${item.metadata.comment || '无'}\n`;
-            exportText += `内容：${item.text}\n\n`;
+            exportText += `World: ${item.metadata.world}\n`;
+            exportText += `Comment: ${item.metadata.comment || 'None'}\n`;
+            exportText += `Content: ${item.text}\n\n`;
         });
     } else {
-        exportText += '无\n\n';
+        exportText += 'None\n\n';
     }
     
     // Chat messages
-    exportText += '=== 聊天记录 ===\n';
+    exportText += '=== Chat History ===\n';
     if (grouped.chat && grouped.chat.length > 0) {
         grouped.chat.forEach(item => {
-            exportText += `#${item.metadata.index}：${item.text}\n\n`;
+            exportText += `#${item.metadata.index}: ${item.text}\n\n`;
         });
     } else {
-        exportText += '无\n\n';
+        exportText += 'None\n\n';
     }
     
     // Create and download file
@@ -624,13 +624,13 @@ async function exportVectors() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `向量导出_${context.name || chatId}_${Date.now()}.txt`;
+    a.download = `Vector_Export_${context.name || chatId}_${Date.now()}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    toastr.success('导出成功');
+    toastr.success('Export successful');
 }
 
 /**
@@ -640,7 +640,7 @@ async function exportVectors() {
 async function previewContent() {
     const items = await getVectorizableContent();
     if (items.length === 0) {
-        toastr.warning('未选择要预览的内容');
+        toastr.warning('No content selected for preview');
         return;
     }
     
@@ -652,12 +652,12 @@ async function previewContent() {
     }, {});
     
     let html = '<div class="vector-preview" style="max-height: none; overflow: visible;">';
-    html += `<div class="preview-header" style="font-size: 1.2em; font-weight: bold; margin-bottom: 1rem; color: var(--SmartThemeQuoteColor);">已选择内容（${items.length} 项）</div>`;
+    html += `<div class="preview-header" style="font-size: 1.2em; font-weight: bold; margin-bottom: 1rem; color: var(--SmartThemeQuoteColor);">Selected Content (${items.length} items)</div>`;
     html += '<div class="preview-sections" style="display: flex; gap: 1rem; overflow: visible;">';
     
     // Files section
     html += '<div class="preview-section" style="flex: 1; display: flex; flex-direction: column; border: 1px solid var(--SmartThemeBorderColor); border-radius: 6px; overflow: hidden; max-height: 60vh;">';
-    html += `<div class="preview-section-title" style="padding: 0.75rem; background-color: var(--SmartThemeQuoteColor); color: var(--SmartThemeBodyColor); border-bottom: 1px solid var(--SmartThemeBorderColor); font-weight: bold;">文件（${grouped.file?.length || 0}）</div>`;
+    html += `<div class="preview-section-title" style="padding: 0.75rem; background-color: var(--SmartThemeQuoteColor); color: var(--SmartThemeBodyColor); border-bottom: 1px solid var(--SmartThemeBorderColor); font-weight: bold;">Files (${grouped.file?.length || 0})</div>`;
     html += '<div class="preview-section-content" style="flex: 1; overflow-y: auto; padding: 1rem;">';
     if (grouped.file && grouped.file.length > 0) {
         html += '<div style="text-align: left;">';
@@ -672,13 +672,13 @@ async function previewContent() {
         });
         html += '</div>';
     } else {
-        html += '<div class="preview-empty" style="color: var(--SmartThemeEmColor); font-style: italic;">无文件</div>';
+        html += '<div class="preview-empty" style="color: var(--SmartThemeEmColor); font-style: italic;">No files</div>';
     }
     html += '</div></div>';
     
     // World Info section
     html += '<div class="preview-section" style="flex: 1; display: flex; flex-direction: column; border: 1px solid var(--SmartThemeBorderColor); border-radius: 6px; overflow: hidden; max-height: 60vh;">';
-    html += `<div class="preview-section-title" style="padding: 0.75rem; background-color: var(--SmartThemeQuoteColor); color: var(--SmartThemeBodyColor); border-bottom: 1px solid var(--SmartThemeBorderColor); font-weight: bold;">世界信息（${grouped.world_info?.length || 0}）</div>`;
+    html += `<div class="preview-section-title" style="padding: 0.75rem; background-color: var(--SmartThemeQuoteColor); color: var(--SmartThemeBodyColor); border-bottom: 1px solid var(--SmartThemeBorderColor); font-weight: bold;">World Info (${grouped.world_info?.length || 0})</div>`;
     html += '<div class="preview-section-content" style="flex: 1; overflow-y: auto; padding: 1rem;">';
     if (grouped.world_info && grouped.world_info.length > 0) {
         html += '<div style="text-align: left;">';
@@ -700,7 +700,7 @@ async function previewContent() {
             
             worldGroups[worldName].forEach((item, index) => {
                 html += `<div style="margin-left: 1rem; margin-top: 0.25rem; margin-bottom: 0.5rem; padding-left: 0.5rem; border-left: 2px solid var(--SmartThemeBorderColor);">`;
-                html += `<span style="display: block; line-height: 1.4;">${item.metadata.comment || '(无注释)'}</span>`;
+                html += `<span style="display: block; line-height: 1.4;">${item.metadata.comment || '(No comment)'}</span>`;
                 html += `</div>`;
             });
             
@@ -713,20 +713,20 @@ async function previewContent() {
         
         html += '</div>';
     } else {
-        html += '<div class="preview-empty" style="color: var(--SmartThemeEmColor); font-style: italic;">无世界信息</div>';
+        html += '<div class="preview-empty" style="color: var(--SmartThemeEmColor); font-style: italic;">No world info</div>';
     }
     html += '</div></div>';
     
     // Chat messages section
     html += '<div class="preview-section" style="flex: 1; display: flex; flex-direction: column; border: 1px solid var(--SmartThemeBorderColor); border-radius: 6px; overflow: hidden; max-height: 60vh;">';
-    html += `<div class="preview-section-title" style="padding: 0.75rem; background-color: var(--SmartThemeQuoteColor); color: var(--SmartThemeBodyColor); border-bottom: 1px solid var(--SmartThemeBorderColor); font-weight: bold;">聊天记录（${grouped.chat?.length || 0} 条消息）</div>`;
+    html += `<div class="preview-section-title" style="padding: 0.75rem; background-color: var(--SmartThemeQuoteColor); color: var(--SmartThemeBodyColor); border-bottom: 1px solid var(--SmartThemeBorderColor); font-weight: bold;">Chat History (${grouped.chat?.length || 0} messages)</div>`;
     html += '<div class="preview-section-content" style="flex: 1; overflow-y: auto; padding: 1rem;">';
     if (grouped.chat && grouped.chat.length > 0) {
         html += '<div style="text-align: left;">';
         grouped.chat.forEach((item, index) => {
-            const msgType = item.metadata.is_user ? '用户' : 'AI';
+            const msgType = item.metadata.is_user ? 'User' : 'AI';
             html += `<div style="margin-bottom: 0.5rem;">`;
-            html += `<strong style="color: var(--SmartThemeQuoteColor);">#${item.metadata.index} - ${msgType}（${item.metadata.name}）${item.metadata.is_hidden ? ' [隐藏]' : ''}</strong><br>`;
+            html += `<strong style="color: var(--SmartThemeQuoteColor);">#${item.metadata.index} - ${msgType} (${item.metadata.name})${item.metadata.is_hidden ? ' [Hidden]' : ''}</strong><br>`;
             html += `<div style="margin-top: 0.5rem; white-space: pre-wrap; word-break: break-word;">${item.text}</div>`;
             html += `</div>`;
             if (index < grouped.chat.length - 1) {
@@ -735,14 +735,14 @@ async function previewContent() {
         });
         html += '</div>';
     } else {
-        html += '<div class="preview-empty" style="color: var(--SmartThemeEmColor); font-style: italic;">无聊天记录</div>';
+        html += '<div class="preview-empty" style="color: var(--SmartThemeEmColor); font-style: italic;">No chat history</div>';
     }
     html += '</div></div>';
     
     html += '</div></div>';
     
     await callGenericPopup(html, POPUP_TYPE.TEXT, '', {
-        okButton: '关闭',
+        okButton: 'Close',
         wide: true,
         large: true
     });
@@ -774,7 +774,7 @@ function getHashValue(str) {
  * @returns {Promise<number>} Number of remaining items
  */
 async function synchronizeChat(batchSize = 5) {
-    // 检查主开关是否启用
+    // Check if the master switch is enabled
     if (!settings.master_enabled) {
         return -1;
     }
@@ -815,13 +815,13 @@ async function rearrangeChat(chat, contextSize, abort, type) {
 
         setExtensionPrompt(EXTENSION_PROMPT_TAG, '', settings.position, settings.depth, settings.include_wi, settings.depth_role);
 
-        // 检查主开关是否启用
+        // Check if the master switch is enabled
         if (!settings.master_enabled) {
             console.debug('Vectors: Master switch disabled, skipping all functionality');
             return;
         }
 
-        // 检查是否启用向量查询
+        // Check if vector query is enabled
         if (!settings.enabled) {
             console.debug('Vectors: Query disabled by user');
             return;
@@ -853,9 +853,9 @@ async function rearrangeChat(chat, contextSize, abort, type) {
                 const results = await queryCollection(collectionId, queryText, settings.max_results || 10);
                 console.debug(`Vectors: Query results for task ${task.name}:`, results);
                 
-                // 根据API返回的结构处理结果
+                // Process results based on the structure returned by the API
                 if (results) {
-                    // 如果API返回了items数组（包含text）
+                    // If the API returns an items array (containing text)
                     if (results.items && Array.isArray(results.items)) {
                         results.items.forEach(item => {
                             if (item.text) {
@@ -871,7 +871,7 @@ async function rearrangeChat(chat, contextSize, abort, type) {
                             }
                         });
                     }
-                    // 如果API只返回了hashes和metadata，尝试从缓存获取
+                    // If the API only returns hashes and metadata, try to get from cache
                     else if (results.hashes && results.metadata) {
                         const cachedData = cachedVectors.get(collectionId);
                         if (cachedData && cachedData.items) {
@@ -983,55 +983,55 @@ async function rearrangeChat(chat, contextSize, abort, type) {
 
 window['vectors_rearrangeChat'] = rearrangeChat;
 
-// 全局事件绑定 - 确保按钮始终有效
+// Global event binding - ensure buttons are always effective
 $(document).on('click', '#vectors_enhanced_preview', async function(e) {
     e.preventDefault();
-    console.log('预览按钮被点击 (全局绑定)');
+    console.log('Preview button clicked (global binding)');
     
     if (!settings.master_enabled) {
-        toastr.warning('请先启用聊天记录超级管理器');
+        toastr.warning('Please enable Chat History Super Manager first');
         return;
     }
     
     try {
         await previewContent();
     } catch (error) {
-        console.error('预览错误:', error);
-        toastr.error('预览失败: ' + error.message);
+        console.error('Preview error:', error);
+        toastr.error('Preview failed: ' + error.message);
     }
 });
 
 $(document).on('click', '#vectors_enhanced_export', async function(e) {
     e.preventDefault();
-    console.log('导出按钮被点击 (全局绑定)');
+    console.log('Export button clicked (global binding)');
     
     if (!settings.master_enabled) {
-        toastr.warning('请先启用聊天记录超级管理器');
+        toastr.warning('Please enable Chat History Super Manager first');
         return;
     }
     
     try {
         await exportVectors();
     } catch (error) {
-        console.error('导出错误:', error);
-        toastr.error('导出失败: ' + error.message);
+        console.error('Export error:', error);
+        toastr.error('Export failed: ' + error.message);
     }
 });
 
 $(document).on('click', '#vectors_enhanced_vectorize', async function(e) {
     e.preventDefault();
-    console.log('向量化按钮被点击 (全局绑定)');
+    console.log('Vectorize button clicked (global binding)');
     
     if (!settings.master_enabled) {
-        toastr.warning('请先启用聊天记录超级管理器');
+        toastr.warning('Please enable Chat History Super Manager first');
         return;
     }
     
     try {
         await vectorizeContent();
     } catch (error) {
-        console.error('向量化错误:', error);
-        toastr.error('向量化失败: ' + error.message);
+        console.error('Vectorization error:', error);
+        toastr.error('Vectorization failed: ' + error.message);
     }
 });
 
@@ -1085,7 +1085,7 @@ function throwIfSourceInvalid() {
         if (!settings.ollama_model) {
             throw new Error('Ollama model not specified');
         }
-        // ollama_url 是可选的，因为有默认值 http://localhost:11434
+        // ollama_url is optional as it has a default value of http://localhost:11434
     }
 }
 
@@ -1152,7 +1152,7 @@ async function queryCollection(collectionId, searchText, topK) {
             searchText: searchText,
             topK: topK,
             threshold: settings.score_threshold,
-            includeText: true, // 请求包含文本内容
+            includeText: true, // Request to include text content
         }),
     });
 
@@ -1209,25 +1209,25 @@ function toggleSettings() {
 function updateMasterSwitchState() {
     const isEnabled = settings.master_enabled;
     
-    // 控制主要设置区域的显示/隐藏
+    // Control visibility of main settings areas
     $('#vectors_enhanced_main_settings').toggle(isEnabled);
     $('#vectors_enhanced_content_settings').toggle(isEnabled);
     $('#vectors_enhanced_tasks_settings').toggle(isEnabled);
     $('#vectors_enhanced_actions_settings').toggle(isEnabled);
     
-    // 如果禁用，还需要禁用所有输入控件（作为额外保护），但确保主开关始终可用
+    // If disabled, also disable all input controls (as an extra precaution), but ensure the master switch is always available
     const settingsContainer = $('#vectors_enhanced_container');
     if (isEnabled) {
-        // 启用时，启用所有控件
+        // When enabled, enable all controls
         settingsContainer.find('input, select, textarea, button').prop('disabled', false);
     } else {
-        // 禁用时，禁用除主开关外的所有控件
+        // When disabled, disable all controls except the master switch
         settingsContainer.find('input, select, textarea, button').not('#vectors_enhanced_master_enabled').prop('disabled', true);
-        // 确保主开关始终启用
+        // Ensure master switch is always enabled
         $('#vectors_enhanced_master_enabled').prop('disabled', false);
     }
     
-    // 更新视觉效果
+    // Update visual effects
     if (isEnabled) {
         settingsContainer.removeClass('vectors-disabled');
     } else {
@@ -1259,7 +1259,7 @@ async function updateFileList() {
     fileList.empty();
     
     if (allFiles.length === 0) {
-        fileList.append('<div class="text-muted">没有可用文件</div>');
+        fileList.append('<div class="text-muted">No available files</div>');
         return;
     }
     
@@ -1268,7 +1268,7 @@ async function updateFileList() {
     const chatFiles = context.chat?.filter(x => x.extra?.file).map(x => x.extra.file) || [];
     
     if (dataBankFiles.length > 0) {
-        fileList.append('<div class="file-group-header">数据库文件</div>');
+        fileList.append('<div class="file-group-header">Databank Files</div>');
         dataBankFiles.forEach(file => {
             const isChecked = settings.selected_content.files.selected.includes(file.url);
             const checkbox = $(`
@@ -1296,7 +1296,7 @@ async function updateFileList() {
     
     if (chatFiles.length > 0) {
         if (dataBankFiles.length > 0) fileList.append('<hr class="m-t-0-5 m-b-0-5">');
-        fileList.append('<div class="file-group-header">聊天附件</div>');
+        fileList.append('<div class="file-group-header">Chat Attachments</div>');
         chatFiles.forEach(file => {
             const isChecked = settings.selected_content.files.selected.includes(file.url);
             const checkbox = $(`
@@ -1332,7 +1332,7 @@ async function updateWorldInfoList() {
     wiList.empty();
     
     if (!entries || entries.length === 0) {
-        wiList.append('<div class="text-muted">没有可用的世界信息条目</div>');
+        wiList.append('<div class="text-muted">No available World Info entries</div>');
         return;
     }
     
@@ -1345,14 +1345,14 @@ async function updateWorldInfoList() {
     });
     
     if (Object.keys(grouped).length === 0) {
-        wiList.append('<div class="text-muted">未找到有效的世界信息条目</div>');
+        wiList.append('<div class="text-muted">No valid World Info entries found</div>');
         return;
     }
     
     for (const [world, worldEntries] of Object.entries(grouped)) {
         const worldDiv = $('<div class="wi-world-group"></div>');
         
-        // 世界名称和全选复选框
+        // World name and select-all checkbox
         const selectedEntries = settings.selected_content.world_info.selected[world] || [];
         const allChecked = worldEntries.length > 0 && worldEntries.every(e => selectedEntries.includes(e.uid));
         
@@ -1366,12 +1366,12 @@ async function updateWorldInfoList() {
             </div>
         `);
         
-        // 创建条目容器（默认隐藏）
+        // Create entry container (hidden by default)
         const entriesContainer = $('<div class="wi-entries-container" style="display: none; padding-left: 2.25rem;"></div>');
         
-        // 折叠/展开事件
+        // Collapse/expand event
         worldHeader.on('click', function(e) {
-            // 如果点击的是复选框，不处理折叠事件
+            // If the checkbox was clicked, don't handle the collapse event
             if ($(e.target).is('input[type="checkbox"]')) {
                 return;
             }
@@ -1388,7 +1388,7 @@ async function updateWorldInfoList() {
             }
         });
         
-        // 全选复选框事件
+        // Select-all checkbox event
         worldHeader.find('.world-select-all').on('change', function() {
             const isChecked = this.checked;
             
@@ -1398,7 +1398,7 @@ async function updateWorldInfoList() {
                 delete settings.selected_content.world_info.selected[world];
             }
             
-            // 更新所有子条目
+            // Update all child entries
             entriesContainer.find('.wi-entry input').prop('checked', isChecked);
             
             Object.assign(extension_settings.vectors_enhanced, settings);
@@ -1407,14 +1407,14 @@ async function updateWorldInfoList() {
         
         worldDiv.append(worldHeader);
         
-        // 条目列表
+        // Entry list
         worldEntries.forEach(entry => {
             const isChecked = selectedEntries.includes(entry.uid);
             
             const checkbox = $(`
                 <label class="checkbox_label wi-entry flex-container alignItemsCenter">
                     <input type="checkbox" value="${entry.uid}" data-world="${world}" ${isChecked ? 'checked' : ''} />
-                    <span class="flex1">${entry.comment || '(无注释)'}</span>
+                    <span class="flex1">${entry.comment || '(No comment)'}</span>
                 </label>
             `);
             
@@ -1432,7 +1432,7 @@ async function updateWorldInfoList() {
                         settings.selected_content.world_info.selected[world].filter(id => id !== entry.uid);
                 }
                 
-                // 更新全选复选框状态
+                // Update select-all checkbox state
                 const allChecked = worldEntries.every(e =>
                     settings.selected_content.world_info.selected[world]?.includes(e.uid)
                 );
@@ -1478,96 +1478,96 @@ const onChatEvent = debounce(async () => {
 }, debounce_timeout.relaxed);
 
 /**
- * 调试函数：探索消息的隐藏机制
+ * Debug function: explore the message hiding mechanism
  * @returns {void}
  */
 function debugHiddenMessages() {
     const context = getContext();
     if (!context.chat || context.chat.length === 0) {
-        console.log('调试：没有可用的聊天消息');
+        console.log('Debug: No available chat messages');
         return;
     }
     
-    console.log('=== 开始探索消息隐藏机制 ===');
-    console.log(`总消息数: ${context.chat.length}`);
+    console.log('=== Start exploring message hiding mechanism ===');
+    console.log(`Total messages: ${context.chat.length}`);
     
-    // 检查前5条消息的完整结构
-    console.log('\n前5条消息的完整结构:');
+    // Check the full structure of the first 5 messages
+    console.log('\nFull structure of the first 5 messages:');
     context.chat.slice(0, 5).forEach((msg, index) => {
-        console.log(`\n消息 #${index}:`, msg);
+        console.log(`\nMessage #${index}:`, msg);
         
-        // 检查可能的隐藏属性
+        // Check for possible hidden properties
         const possibleHiddenProps = ['hidden', 'is_hidden', 'hide', 'isHidden', 'visible', 'is_visible'];
-        console.log(`检查可能的隐藏属性:`);
+        console.log(`Checking for possible hidden properties:`);
         possibleHiddenProps.forEach(prop => {
             if (prop in msg) {
                 console.log(`  - ${prop}: ${msg[prop]}`);
             }
         });
         
-        // 检查 extra 对象
+        // Check the extra object
         if (msg.extra) {
-            console.log(`  extra 对象:`, msg.extra);
+            console.log(`  extra object:`, msg.extra);
         }
     });
     
-    console.log('\n=== 探索结束 ===');
+    console.log('\n=== Exploration finished ===');
 }
 
 /**
- * 调试函数：测试斜杠命令执行
+ * Debug function: test slash command execution
  * @returns {Promise<void>}
  */
 async function debugSlashCommands() {
-    console.log('=== 测试斜杠命令执行 ===');
+    console.log('=== Testing slash command execution ===');
     
     try {
-        // 检查可能的命令执行方法
+        // Check possible command execution methods
         const context = getContext();
-        console.log('\n检查上下文对象:', context);
+        console.log('\nChecking context object:', context);
         
-        // 方法1：直接修改消息的 is_system 属性
+        // Method 1: Directly modify the is_system property of a message
         if (context.chat && context.chat.length > 0) {
-            console.log('\n测试直接修改消息属性:');
+            console.log('\nTesting direct modification of message properties:');
             const testMessage = context.chat[0];
-            console.log('第一条消息的 is_system 状态:', testMessage.is_system);
-            console.log('可以通过修改 is_system 属性来隐藏/显示消息');
+            console.log('is_system status of the first message:', testMessage.is_system);
+            console.log('Messages can be hidden/shown by modifying the is_system property');
         }
         
-        // 方法2：查看全局函数
+        // Method 2: Check global functions
         const globalFunctions = Object.keys(window).filter(key =>
             key.includes('hide') || key.includes('slash') || key.includes('command')
         );
-        console.log('\n相关的全局函数:', globalFunctions);
+        console.log('\nRelated global functions:', globalFunctions);
         
-        // 方法3：检查 jQuery 事件
-        console.log('\n检查消息元素的事件处理器...');
+        // Method 3: Check jQuery events
+        console.log('\nChecking event handlers of message elements...');
         const messageElement = $('.mes').first();
         if (messageElement.length > 0) {
             const events = $._data(messageElement[0], 'events');
-            console.log('消息元素的事件:', events);
+            console.log('Message element events:', events);
         }
         
     } catch (error) {
-        console.error('调试斜杠命令时出错:', error);
+        console.error('Error while debugging slash commands:', error);
     }
     
-    console.log('=== 测试结束 ===');
+    console.log('=== Test finished ===');
 }
 
 /**
- * 显示当前隐藏的消息列表
+ * Displays a list of currently hidden messages
  * @returns {Promise<void>}
  */
 async function showHiddenMessages() {
     const hidden = getHiddenMessages();
     
     if (hidden.length === 0) {
-        await callGenericPopup('当前没有隐藏的消息', POPUP_TYPE.TEXT, '', { okButton: '关闭' });
+        await callGenericPopup('There are currently no hidden messages', POPUP_TYPE.TEXT, '', { okButton: 'Close' });
         return;
     }
     
-    // 计算隐藏消息的楼层范围
+    // Calculate the floor ranges of hidden messages
     const indexes = hidden.map(msg => msg.index).sort((a, b) => a - b);
     const ranges = [];
     let start = indexes[0];
@@ -1577,35 +1577,35 @@ async function showHiddenMessages() {
         if (indexes[i] === end + 1) {
             end = indexes[i];
         } else {
-            ranges.push(start === end ? `第${start}层` : `第${start}-${end}层`);
+            ranges.push(start === end ? `Floor ${start}` : `Floors ${start}-${end}`);
             start = end = indexes[i];
         }
     }
-    ranges.push(start === end ? `第${start}层` : `第${start}-${end}层`);
+    ranges.push(start === end ? `Floor ${start}` : `Floors ${start}-${end}`);
     
-    const rangeText = ranges.join('，');
+    const rangeText = ranges.join(', ');
     
     let html = '<div class="hidden-messages-popup">';
-    html += `<h3 style="color: var(--SmartThemeQuoteColor); margin-bottom: 1rem; font-size: 1.2em; text-align: left;">已隐藏楼层：${rangeText}</h3>`;
+    html += `<h3 style="color: var(--SmartThemeQuoteColor); margin-bottom: 1rem; font-size: 1.2em; text-align: left;">Hidden Floors: ${rangeText}</h3>`;
     html += '<div class="hidden-messages-all-content" style="max-height: 60vh; overflow-y: auto; padding: 1rem; background-color: var(--SmartThemeBlurTintColor); border-radius: 6px; text-align: left; white-space: pre-wrap; word-break: break-word;">';
     
-    // 按索引排序并显示所有隐藏消息
+    // Sort by index and display all hidden messages
     hidden.sort((a, b) => a.index - b.index).forEach((msg, idx) => {
-        const msgType = msg.is_user ? '用户' : 'AI';
-        html += `<span style="color: var(--SmartThemeQuoteColor); font-weight: bold;">#${msg.index} - ${msgType}（${msg.name}）：</span>\n${msg.text}\n\n`;
+        const msgType = msg.is_user ? 'User' : 'AI';
+        html += `<span style="color: var(--SmartThemeQuoteColor); font-weight: bold;">#${msg.index} - ${msgType} (${msg.name}):</span>\n${msg.text}\n\n`;
     });
     
     html += '</div></div>';
     
     await callGenericPopup(html, POPUP_TYPE.TEXT, '', {
-        okButton: '关闭',
+        okButton: 'Close',
         wide: true,
         large: true
     });
 }
 
 /**
- * 更新隐藏消息信息显示
+ * Updates the hidden messages info display
  */
 function updateHiddenMessagesInfo() {
     const hidden = getHiddenMessages();
@@ -1619,10 +1619,10 @@ function updateHiddenMessagesInfo() {
         infoDiv.show();
         listDiv.empty();
         
-        // 只显示前5条隐藏消息的预览
+        // Only show a preview of the first 5 hidden messages
         const preview = hidden.slice(0, 5);
         preview.forEach(msg => {
-            const msgType = msg.is_user ? '用户' : 'AI';
+            const msgType = msg.is_user ? 'User' : 'AI';
             const item = $(`
                 <div class="hidden-message-preview">
                     <strong>#${msg.index}</strong> - ${msgType}: ${msg.text}
@@ -1632,7 +1632,7 @@ function updateHiddenMessagesInfo() {
         });
         
         if (hidden.length > 5) {
-            listDiv.append(`<div class="text-muted">...还有 ${hidden.length - 5} 条隐藏消息</div>`);
+            listDiv.append(`<div class="text-muted">...and ${hidden.length - 5} more hidden messages</div>`);
         }
     } else {
         infoDiv.hide();
@@ -1640,89 +1640,89 @@ function updateHiddenMessagesInfo() {
 }
 
 /**
- * 切换消息的隐藏状态
- * @param {number} messageIndex 消息索引
- * @param {boolean} hide 是否隐藏
- * @returns {Promise<boolean>} 是否成功
+ * Toggles the hidden state of a message
+ * @param {number} messageIndex Message index
+ * @param {boolean} hide Whether to hide
+ * @returns {Promise<boolean>} Whether successful
  */
 async function toggleMessageVisibility(messageIndex, hide) {
     const context = getContext();
     if (!context.chat || messageIndex < 0 || messageIndex >= context.chat.length) {
-        console.error('无效的消息索引:', messageIndex);
+        console.error('Invalid message index:', messageIndex);
         return false;
     }
     
     try {
-        // 修改消息的 is_system 属性
+        // Modify the message's is_system property
         context.chat[messageIndex].is_system = hide;
         
-        // 触发保存
+        // Trigger save
         await context.saveChat();
         
-        // 刷新界面
+        // Refresh the UI
         await context.reloadCurrentChat();
         
         return true;
     } catch (error) {
-        console.error('切换消息可见性失败:', error);
+        console.error('Failed to toggle message visibility:', error);
         return false;
     }
 }
 
 /**
- * 批量切换消息范围的隐藏状态
- * @param {number} startIndex 开始索引
- * @param {number} endIndex 结束索引（不包含）
- * @param {boolean} hide 是否隐藏
+ * Bulk toggles the hidden state of a range of messages
+ * @param {number} startIndex Start index
+ * @param {number} endIndex End index (exclusive)
+ * @param {boolean} hide Whether to hide
  * @returns {Promise<void>}
  */
 async function toggleMessageRangeVisibility(startIndex, endIndex, hide) {
     const context = getContext();
     if (!context.chat) {
-        toastr.error('没有可用的聊天记录');
+        toastr.error('No chat history available');
         return;
     }
     
-    // 确保索引有效
+    // Ensure indexes are valid
     const actualEnd = endIndex === -1 ? context.chat.length : Math.min(endIndex, context.chat.length);
     const actualStart = Math.max(0, startIndex);
     
     if (actualStart >= actualEnd) {
-        toastr.error('无效的消息范围');
+        toastr.error('Invalid message range');
         return;
     }
     
     try {
-        // 批量修改消息
+        // Bulk modify messages
         let modifiedCount = 0;
         for (let i = actualStart; i < actualEnd; i++) {
             const msg = context.chat[i];
             if (!msg) continue;
             
-            // 只处理用户和AI消息，跳过真正的系统消息
-            // 注意：is_user 表示用户消息，没有 is_user 标记的通常是AI消息
-            // is_system 是用来标记隐藏状态的
+            // Only process user and AI messages, skip real system messages
+            // Note: is_user indicates a user message, those without the is_user flag are usually AI messages
+            // is_system is used to mark the hidden state
             if (msg.is_user !== undefined || msg.name) {
                 context.chat[i].is_system = hide;
                 modifiedCount++;
             }
         }
         
-        // 保存并刷新
+        // Save and refresh
         await context.saveChat();
         await context.reloadCurrentChat();
         
-        const action = hide ? '隐藏' : '显示';
-        toastr.success(`已${action} ${modifiedCount} 条消息`);
+        const action = hide ? 'hid' : 'shown';
+        toastr.success(`Successfully ${action} ${modifiedCount} messages`);
     } catch (error) {
-        console.error('批量切换消息可见性失败:', error);
-        toastr.error('操作失败: ' + error.message);
+        console.error('Bulk toggle message visibility failed:', error);
+        toastr.error('Operation failed: ' + error.message);
     }
 }
 
 /**
- * 获取当前隐藏的消息信息
- * @returns {Array<{index: number, text: string}>} 隐藏的消息列表
+ * Gets info on currently hidden messages
+ * @returns {Array<{index: number, text: string}>} List of hidden messages
  */
 function getHiddenMessages() {
     const context = getContext();
@@ -1744,41 +1744,41 @@ function getHiddenMessages() {
 }
 
 jQuery(async () => {
-    // 使用独立的设置键避免冲突
+    // Use a separate settings key to avoid conflicts
     const SETTINGS_KEY = 'vectors_enhanced';
     
     if (!extension_settings[SETTINGS_KEY]) {
         extension_settings[SETTINGS_KEY] = settings;
     }
 
-    // 深度合并设置，确保所有必需的属性都存在
+    // Deep merge settings to ensure all required properties exist
     Object.assign(settings, extension_settings[SETTINGS_KEY]);
     
-    // 确保 chat types 存在（处理旧版本兼容性）
+    // Ensure chat types exist (for backward compatibility)
     if (!settings.selected_content.chat.types) {
         settings.selected_content.chat.types = { user: true, assistant: true };
     }
     
-    // 确保 include_hidden 属性存在
+    // Ensure include_hidden property exists
     if (settings.selected_content.chat.include_hidden === undefined) {
         settings.selected_content.chat.include_hidden = false;
     }
     
-    // 确保所有必需的结构都存在
+    // Ensure all required structures exist
     if (!settings.selected_content.chat.range) {
         settings.selected_content.chat.range = { start: 0, end: -1 };
     }
     
-    // 确保 vector_tasks 存在
+    // Ensure vector_tasks exists
     if (!settings.vector_tasks) {
         settings.vector_tasks = {};
     }
     
-    // 保存修正后的设置
+    // Save the corrected settings
     Object.assign(extension_settings[SETTINGS_KEY], settings);
     saveSettingsDebounced();
 
-    // 第三方插件需要使用完整路径
+    // Third-party extensions need to use the full path
     const template = await renderExtensionTemplateAsync('third-party/vectors-enhanced', 'settings');
     $('#extensions_settings2').append(template);
 
@@ -1879,7 +1879,7 @@ jQuery(async () => {
         saveSettingsDebounced();
     });
     
-    // 内容标签设置事件处理器
+    // Content tags settings event handlers
     $('#vectors_enhanced_tag_chat').on('input', () => {
         const value = $('#vectors_enhanced_tag_chat').val().trim() || 'past_chat';
         settings.content_tags.chat = value;
@@ -1960,7 +1960,7 @@ jQuery(async () => {
         }
     });
 
-    // Chat settings handlers - 确保所有属性都存在
+    // Chat settings handlers - ensure all properties exist
     const chatRange = settings.selected_content.chat.range || { start: 0, end: -1 };
     const chatTypes = settings.selected_content.chat.types || { user: true, assistant: true };
     const chatTags = settings.selected_content.chat.tags || '';
@@ -2013,16 +2013,16 @@ jQuery(async () => {
     // Refresh buttons
     $('#vectors_enhanced_files_refresh').on('click', async () => {
         await updateFileList();
-        toastr.info('文件列表已刷新');
+        toastr.info('File list refreshed');
     });
 
     $('#vectors_enhanced_wi_refresh').on('click', async () => {
         await updateWorldInfoList();
-        toastr.info('世界信息列表已刷新');
+        toastr.info('World Info list refreshed');
     });
     
     
-    // 隐藏消息管理功能
+    // Hidden message management functions
     $('#vectors_enhanced_include_hidden').prop('checked', includeHidden).on('input', () => {
         settings.selected_content.chat.include_hidden = $('#vectors_enhanced_include_hidden').prop('checked');
         Object.assign(extension_settings.vectors_enhanced, settings);
@@ -2051,7 +2051,7 @@ jQuery(async () => {
     updateContentSelection();
     updateChatSettings();
     
-    // 加载内容标签设置（确保向后兼容）
+    // Load content tag settings (ensure backward compatibility)
     if (!settings.content_tags) {
         settings.content_tags = {
             chat: 'past_chat',
@@ -2100,7 +2100,7 @@ jQuery(async () => {
         updateHiddenMessagesInfo();
     });
     
-    // 监听聊天重新加载事件，以便在使用 /hide 和 /unhide 命令后更新
+    // Listen for chat reload events to update after using /hide and /unhide commands
     eventSource.on(event_types.CHAT_LOADED, async () => {
         updateHiddenMessagesInfo();
     });
@@ -2112,7 +2112,7 @@ jQuery(async () => {
             await previewContent();
             return '';
         },
-        helpString: '预览选中的向量化内容',
+        helpString: 'Preview selected content for vectorization',
     }));
 
     SlashCommandParser.addCommandObject(SlashCommand.fromProps({
@@ -2121,7 +2121,7 @@ jQuery(async () => {
             await exportVectors();
             return '';
         },
-        helpString: '导出向量化内容到文本文件',
+        helpString: 'Export vectorized content to a text file',
     }));
 
     SlashCommandParser.addCommandObject(SlashCommand.fromProps({
@@ -2130,17 +2130,17 @@ jQuery(async () => {
             await vectorizeContent();
             return '';
         },
-        helpString: '处理并向量化选中的内容',
+        helpString: 'Process and vectorize the selected content',
     }));
 
-    registerDebugFunction('purge-vectors', '清除所有向量', '删除当前聊天的所有向量数据', async () => {
+    registerDebugFunction('purge-vectors', 'Purge all vectors', 'Delete all vector data for the current chat', async () => {
         const chatId = getCurrentChatId();
         if (!chatId) {
-            toastr.error('未选择聊天');
+            toastr.error('No chat selected');
             return;
         }
         if (await purgeVectorIndex(chatId)) {
-            toastr.success('向量已清除');
+            toastr.success('Vectors purged');
         }
     });
     
